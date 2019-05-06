@@ -1,4 +1,5 @@
 ﻿using EarTrumpet.Extensibility.Hosting;
+using EarTrumpet.Interop.Helpers;
 using EarTrumpet.UI.Helpers;
 using System.Windows.Input;
 
@@ -15,10 +16,10 @@ namespace EarTrumpet.UI.ViewModels
 
         Addon _addon;
 
-        public AddonAboutPageViewModel(object addonObject) : base(DefaultManagementGroupName)
+        public AddonAboutPageViewModel(Addon addon) : base(DefaultManagementGroupName)
         {
             Glyph = "\xE946";
-            _addon = AddonManager.Current.FindAddonForObject(addonObject);
+            _addon = addon;
             Title = Properties.Resources.AboutThisAddonText.Replace("{Name}", DisplayName);
 
             OpenHelpLink = new RelayCommand(() => ProcessHelper.StartNoThrow(_addon.HelpLink));

@@ -5,6 +5,8 @@ namespace EarTrumpet.Interop
 {
     class Shell32
     {
+        public static readonly int WM_TASKBARCREATED = User32.RegisterWindowMessage("TaskbarCreated");
+
         public const int KF_FLAG_DONT_VERIFY = 0x00004000;
 
         [Flags]

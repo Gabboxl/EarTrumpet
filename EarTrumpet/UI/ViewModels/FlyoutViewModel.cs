@@ -37,13 +37,15 @@ namespace EarTrumpet.UI.ViewModels
 
         private readonly DeviceCollectionViewModel _mainViewModel;
         private readonly DispatcherTimer _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
+        private readonly Dispatcher _currentDispatcher = Dispatcher.CurrentDispatcher;
         private bool _closedDuringOpen;
+        private Action _returnFocusToTray;
 
-        public FlyoutViewModel(DeviceCollectionViewModel mainViewModel)
+        public FlyoutViewModel(DeviceCollectionViewModel mainViewModel, Action returnFocusToTray)
         {
             Dialog = new ModalDialogViewModel();
             Devices = new ObservableCollection<DeviceViewModel>();
-
+            _returnFocusToTray = returnFocusToTray;
             _mainViewModel = mainViewModel;
             _mainViewModel.DefaultChanged += OnDefaultPlaybackDeviceChanged;
             _mainViewModel.AllDevices.CollectionChanged += AllDevices_CollectionChanged;
@@ -218,7 +220,7 @@ namespace EarTrumpet.UI.ViewModels
         private void InvalidateWindowSize()
         {
             // We must be async because otherwise SetWindowPos will pump messages before the UI has updated.
-            App.Current.Dispatcher.BeginInvoke((Action)(() =>
+            _currentDispatcher.BeginInvoke((Action)(() =>
             {
                 WindowSizeInvalidated?.Invoke(this, null);
             }));
@@ -257,6 +259,11 @@ namespace EarTrumpet.UI.ViewModels
                 case ViewState.Closing_Stage1:
                     _mainViewModel.OnTrayFlyoutHidden();
                     Dialog.IsVisible = false;
+
+                    if (LastInput == InputType.Keyboard && !IsExpandingOrCollapsing)
+                    {
+                        _returnFocusToTray.Invoke();
+                    }
                     break;
                 case ViewState.Closing_Stage2:
                     _hideTimer.Start();

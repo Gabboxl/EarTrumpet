@@ -215,6 +215,7 @@ namespace EarTrumpet.UI.ViewModels
             _deviceManager.Default = _device;
         }
 
+        public void IncrementVolume(int delta) => Volume += delta;
         public override string ToString() => string.Format(IsMuted ? Properties.Resources.AppOrDeviceMutedFormatAccessibleText : Properties.Resources.AppOrDeviceFormatAccessibleText, DisplayName, Volume);
     }
 }

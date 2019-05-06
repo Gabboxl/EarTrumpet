@@ -6,12 +6,6 @@ namespace EarTrumpet.Interop.Helpers
 {
     class InputHelper
     {
-        public struct MouseInputState
-        {
-            public POINT Position;
-            public int WheelDelta;
-        }
-
         public static void RegisterForMouseInput(IntPtr handle)
         {
             var data = new User32.RAWINPUTDEVICE
@@ -52,9 +46,9 @@ namespace EarTrumpet.Interop.Helpers
             return ret;
         }
 
-        public static bool ProcessMouseInputMessage(IntPtr lParam, ref MouseInputState state)
+        public static bool ProcessMouseInputMessage(IntPtr lParam, ref POINT cursorPosition, out int wheelDelta)
         {
-            state.WheelDelta = 0;
+            wheelDelta = 0;
             bool isApplicableMouseMessage = false;
 
             var header = new User32.RAWINPUTHEADER();
@@ -77,23 +71,18 @@ namespace EarTrumpet.Interop.Helpers
                         {
                             if (User32.GetCursorPos(out var pt))
                             {
-                                state.Position = pt;
-                            }
-                            else
-                            {
-                                // Unexpected except for transient situations.
-                                Debug.Assert(false);
+                                cursorPosition = pt;
                             }
                         }
                         else
                         {
-                            state.Position.Y += rawInput.mouse.lLastY;
-                            state.Position.X += rawInput.mouse.lLastX;
+                            cursorPosition.Y += rawInput.mouse.lLastY;
+                            cursorPosition.X += rawInput.mouse.lLastX;
                         }
 
                         if ((rawInput.mouse.usButtonFlags & User32.RI_MOUSE_WHEEL) == User32.RI_MOUSE_WHEEL)
                         {
-                            state.WheelDelta = rawInput.mouse.usButtonData;
+                            wheelDelta = rawInput.mouse.usButtonData;
                         }
                     }
                 }

@@ -11,22 +11,23 @@ namespace EarTrumpet.Interop.Helpers
         public static Icon LoadSmallIcon(string path)
         {
             var dpi = WindowsTaskbar.Dpi;
-            int cx = User32.GetSystemMetricsForDpi(User32.SystemMetrics.SM_CXSMICON, dpi);
-            int cy = User32.GetSystemMetricsForDpi(User32.SystemMetrics.SM_CYSMICON, dpi);
-
             Icon icon = null;
             if (path.StartsWith("pack://"))
             {
                 using (var stream = System.Windows.Application.GetResourceStream(new Uri(path)).Stream)
                 {
-                    icon = new Icon(stream, new Size(cx, cy));
+                    icon = new Icon(stream, new Size(
+                        User32.GetSystemMetricsForDpi(User32.SystemMetrics.SM_CXICON, dpi), 
+                        User32.GetSystemMetricsForDpi(User32.SystemMetrics.SM_CYICON, dpi)));
                 }
             }
             else
             {
                 var iconPath = new StringBuilder(path);
                 int iconIndex = Shlwapi.PathParseIconLocationW(iconPath);
-                icon = LoadIconWithScaleDown(iconPath.ToString(), iconIndex, cx, cy);
+                icon = LoadIconWithScaleDown(iconPath.ToString(), iconIndex, 
+                    User32.GetSystemMetricsForDpi(User32.SystemMetrics.SM_CXSMICON, dpi), 
+                    User32.GetSystemMetricsForDpi(User32.SystemMetrics.SM_CYSMICON, dpi));
             }
 
             Trace.WriteLine($"IconHelper LoadSmallIcon {icon?.Size.Width}x{icon?.Size.Height} {path}");

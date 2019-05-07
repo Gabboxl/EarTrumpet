@@ -331,6 +331,10 @@ namespace EarTrumpet.Interop
         public enum SystemMetrics : int
         {
             // ...
+        
+            SM_CXICON = 11,
+            SM_CYICON = 12,
+
             SM_CXSMICON = 49,
             SM_CYSMICON = 50
             // ...
